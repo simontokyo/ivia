@@ -1,5 +1,5 @@
 # Version Information
-These assets are for IBM Verify Identity Access v11.0.0.0.
+These assets are for IBM Verify Identity Access v11.0.2.0.
 They will also work for older versions (eg. IBM Security Verify Access v10.0.8.0) if version is changed where appropriate.
 
 Assets for v10.0.0.0 (which will also work with v10.0.1.0) are available as a release.  Checkout tag `v10.0.0.0-1`.
@@ -30,21 +30,6 @@ All passwords set by these scripts are `Passw0rd`.  Obviously this is not a secu
 Before running any other scripts, run `verify-access-container-deployment/common/create-ldap-and-postgres-isvaop-keys.sh`
 
 This will create the `verify-access-container-deployment/local/dockerkeys` directory and populate it with keystores for PostgreSQL and OpenLDAP containers.
-
-# Native Docker
-To set up a native Docker environment, use the files in `verify-access-container-deployment/docker`.
-
-These scripts assume you have the following IP addresses available locally on your Docker system with entries in `/etc/hosts` for the associated hostnames:
-- 127.0.0.2 (lmi.iamlab.ibm.com)
-- 127.0.0.3 (www.iamlab.ibm.com)
-
-If you want to use other local IP addresses then you'll need to modify the `common/env-config.sh` file.
-
-Run `./docker-setup.sh` script to create docker containers.
-
-You can now connect to the Verify Identity Access LMI at https://127.0.0.2
-
-To clean up the docker resources created, run the `./cleanup.sh` script.
 
 # Docker Compose
 To set up an environment with docker-compose, use the files in container-deployment/compose.
@@ -101,33 +86,6 @@ You can add an ingress to the Kubernetes cluster provided by Docker CE on MAC us
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/cloud/deploy.yaml
 ```
 
-# Helm 3.0
-To set up an environment using Helm, use the files in `container-deployment/helm`.
-
-> Enhancements have been made to the Helm chart for v10.0.2.0 (chart version v1.3.0) to allow service names to be set.  This means that the release created can work with configuration archives saved from other environments without the need to modify CoreDNS.  For more details, see the chart release notes.
-
-These scripts assume that you have the `kubectl` and `helm` utilities installed and that they are configured to talk to a cluster.
-
-First, run `./create-secrets.sh` command to create the secrets required for the environment.
-
-Then, run `./helm-install.sh` to run the helm command to create a Security Verify release (called `iamlab`).
-
-The output from this command includes the information you will need to connect to the LMI and Reverse Proxy services.
-
-To delete the release and clean up, run the `./cleanup.sh` command.
-
-The Helm Charts included here are also hosted in the incubator repo at: https://github.com/ibm-security/helm-charts. You can add these as a Helm repo using command:
-```
-helm repo add ibm-security-incubator https://raw.githubusercontent.com/IBM-Security/helm-charts/master/repo/incubator
-```
-
-# OpenShift
-To set up an environment using OpenShift, use the files in `verify-access-container-deployment/openshift`.
-
-OpenShift 4.2 or above is required for lightweight containers to work with the default security context.  For older versions your can use the OpenShift 3.x template file.  These instructions are for OpenShift 4.x.
-
-These scripts assume that you have the `oc` utility installed and it is configured to talk to your OpenShift system.
-
 ## Login and create project
 Login as your standard user:
 
@@ -169,17 +127,6 @@ oc create -f verify-access-operator-template.yaml
 ## Deploy applications
 You can deploy applications using either the OpenShift console or using the command line.
 
-### Deploy in OpenShift console
-Perform the following actions:
-1. Open the OpenShift console
-1. Login as your standard user
-1. Select **+Add**
-1. Select **From Catalog**
-1. Use **verify** in search bar
-1. Select template and deploy
-
-As part of deploying a template you will get the chance to update the default deploy parameters.
-
 ### Deploy on the command line
 Use the following command to search for Verify Identity Access templates:
 ```
@@ -206,10 +153,6 @@ OpenShift includes a web proxy which can route traffic to the Verify Identity Ac
 
 To allow worker containers to access configuration snapshots, you must create an LMI user that matches the `configuration read username` and `configuration read password` set during deployment of the configuration container. This is done under **System->Account management** in the LMI. The default username is `cfgsvc` and this user already exists in the LMI.  If you use this username you will only need to set the password.
 
-
-## OpenShift Operator deployment
-The [Operator Deployment Demo](openshift/alt-deployment-configs/operator/README.md) can be used to automate management of 
-production containers using the Verify Identity Access Operator.
 
 # Automated Configuration
 New deployments can be automatically configured using the `verify-access-autoconf` python package to apply a YAML configuration file. The provided ``first-steps.yaml`` configuration file assumes that you have a copy of the PKI used to deploy the containers in the configuration directory.

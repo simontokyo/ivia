@@ -251,9 +251,9 @@ docker rmi <image-id>
 
 ## Version Information
 
-- **IBM Verify Access**: 11.0.0.0
+- **IBM Verify Access**: 11.0.2.0
 - **OpenLDAP**: 10.0.6.0
-- **PostgreSQL**: 11.0.0.0
+- **PostgreSQL**: 11.0.2.0
 - **OIDC Provider**: 24.12
 
 ---

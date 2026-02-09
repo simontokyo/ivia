@@ -1,6 +1,6 @@
 # IBM Verify Access Docker Compose Deployment Guide
+This guide provides step-by-step instructions for deploying IBM Verify Access v11.0.2.0 using Docker Compose.
 
-This guide provides step-by-step instructions for deploying IBM Verify Access v11.0.0.0 using Docker Compose.
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -253,9 +253,9 @@ cat .env
 TIMEZONE=Australia/Brisbane
 ADMIN_PASSWORD=Passw0rd
 CONTAINER_BASE=icr.io/ivia/ivia
-ISVA_VERSION=11.0.0.0
-LDAP_VERSION=11.0.0.0
-DB_VERSION=11.0.0.0
+ISVA_VERSION=11.0.2.0
+LDAP_VERSION=11.0.2.0
+DB_VERSION=11.0.2.0
 LMI_IP=127.0.0.2
 WEB1_IP=127.0.0.3
 WEB2_IP=127.0.0.4
@@ -265,7 +265,7 @@ IVIAOP_VERSION=24.12
 **Customization Options**:
 - `TIMEZONE`: Set to your timezone (e.g., `Asia/Tokyo`, `America/New_York`)
 - `ADMIN_PASSWORD`: Change from default `Passw0rd` (recommended for production)
-- `ISVA_VERSION`: Container version (default: 11.0.0.0)
+- `ISVA_VERSION`: Container version (default: 11.0.2.0)
 - IP addresses: Already configured from env-config.sh
 
 #### For Snapshot Manager Deployment (snapmgr):
@@ -305,12 +305,12 @@ docker-compose pull
 ```
 
 **Images that will be pulled**:
-- `icr.io/ivia/ivia-config:11.0.0.0`
-- `icr.io/ivia/ivia-wrp:11.0.0.0`
-- `icr.io/ivia/ivia-runtime:11.0.0.0`
-- `icr.io/ivia/ivia-dsc:11.0.0.0`
+- `icr.io/ivia/ivia-config:11.0.2.0`
+- `icr.io/ivia/ivia-wrp:11.0.2.0`
+- `icr.io/ivia/ivia-runtime:11.0.2.0`
+- `icr.io/ivia/ivia-dsc:11.0.2.0`
 - `icr.io/isva/verify-access-openldap:10.0.6.0`
-- `icr.io/ivia/ivia-postgresql:11.0.0.0`
+- `icr.io/ivia/ivia-postgresql:11.0.2.0`
 - `icr.io/ivia/ivia-oidc-provider:24.12`
 
 ### Step 8: Launch the Environment
@@ -567,7 +567,7 @@ rm -rf /root/ivia/verify-access-container-deployment/local/dockerkeys
 docker images | grep ivia
 
 # Remove specific image
-docker rmi icr.io/ivia/ivia-config:11.0.0.0
+docker rmi icr.io/ivia/ivia-config:11.0.2.0
 
 # Remove all unused images
 docker image prune -a
@@ -636,7 +636,7 @@ docker-compose up -d --scale iviadsc=3
 ## Version Information
 
 - **Guide Version**: 1.0
-- **IBM Verify Access Version**: 11.0.0.0
+- **IBM Verify Access Version**: 11.0.2.0
 - **Tested with Docker**: 20.10+
 - **Tested with Docker Compose**: 1.29+ / V2
 - **Last Updated**: 2026-02-09

@@ -1,0 +1,137 @@
+version: '3'
+
+volumes:
+  iviaconfig:
+  libldap:
+  ldapslapd:
+  libsecauthority:
+  pgdata:
+
+services:
+
+#
+# Verify Identity Access Containers
+#
+
+  iviaconfig:
+    image: ${CONTAINER_BASE}-config:${ISVA_VERSION}
+    hostname: iviaconfig
+    restart: always
+    environment:
+#     - SNAPSHOT=${SNAPSHOT}
+#     - FIXPACKS=${FIXPACKS}
+      - CONTAINER_TIMEZONE=${TIMEZONE}
+      - ADMIN_PWD=${ADMIN_PASSWORD}
+      - CONFIG_SERVICE_URL=https://iviasnapmgr:9443
+      - CONFIG_SERVICE_USER_NAME=snapmgr
+      - CONFIG_SERVICE_USER_PWD=${SNAPMGR_PW}
+    volumes:
+      - iviaconfig:/var/shared
+    ports:
+      - ${LMI_IP}:443:9443
+    depends_on:
+      - openldap
+      - postgresql
+
+  iviawrprp1:
+    image: ${CONTAINER_BASE}-wrp:${ISVA_VERSION}
+    hostname: iviawrprp1
+    networks:
+      default:
+        aliases:
+          - www.iamlab.ibm.com
+    restart: always
+    environment:
+      - INSTANCE=rp1
+#     - SNAPSHOT=${SNAPSHOT}
+#     - FIXPACKS=${FIXPACKS}
+      - CONTAINER_TIMEZONE=${TIMEZONE}
+      - CONFIG_SERVICE_URL=https://iviasnapmgr:9443
+      - CONFIG_SERVICE_USER_NAME=snapmgr
+      - CONFIG_SERVICE_USER_PWD=${SNAPMGR_PW}
+    ports:
+      - ${WEB1_IP}:443:9443
+    depends_on:
+      - openldap
+      - iviasnapmgr
+
+  iviaruntime:
+    image: ${CONTAINER_BASE}-runtime:${ISVA_VERSION}
+    hostname: iviaruntime
+    restart: always
+    environment:
+#     - SNAPSHOT=${SNAPSHOT}
+#     - FIXPACKS=${FIXPACKS}
+      - CONTAINER_TIMEZONE=${TIMEZONE}
+      - CONFIG_SERVICE_URL=https://iviasnapmgr:9443
+      - CONFIG_SERVICE_USER_NAME=snapmgr
+      - CONFIG_SERVICE_USER_PWD=${SNAPMGR_PW}
+    depends_on:
+      - openldap
+      - postgresql
+      - iviasnapmgr
+
+  iviadsc:
+    image: ${CONTAINER_BASE}-dsc:${ISVA_VERSION}
+    hostname: iviadsc
+    restart: always
+    environment:
+      - INSTANCE=1
+#     - SNAPSHOT=${SNAPSHOT}
+#     - FIXPACKS=${FIXPACKS}
+      - CONTAINER_TIMEZONE=${TIMEZONE}
+      - CONFIG_SERVICE_URL=https://iviasnapmgr:9443
+      - CONFIG_SERVICE_USER_NAME=snapmgr
+      - CONFIG_SERVICE_USER_PWD=${SNAPMGR_PW}
+    depends_on:
+      - iviasnapmgr
+
+#
+# Service Containers
+#
+
+  iviasnapmgr:
+    image: ${CONTAINER_BASE}-snapshotmgr:${ISVA_VERSION}
+    hostname: iviasnapmgr
+    restart: always
+    environment:
+      - USERNAME=snapmgr
+      - PASSWORD=${SNAPMGR_PW}
+    volumes:
+      - /data
+
+  openldap:
+    image: ${CONTAINER_BASE}-openldap:${LDAP_VERSION}
+    hostname: openldap
+    restart: always
+    command: --copy-service
+    environment:
+      - LDAP_ADMIN_PASSWORD=Passw0rd
+      - LDAP_CONFIG_PASSWORD=Passw0rd
+      - LDAP_DOMAIN=ibm.com
+#     - LDAP_BASE_DN=${LDAP_BASE_DN}
+#     - LDAP_TLS_VERIFY_CLIENT=${LDAP_TLS_VERIFY_CLIENT}
+#     - LDAP_ORGANISATION=${LDAP_ORGANISATION}
+#     - LDAP_ENABLE_PORT_389=${LDAP_SSL_DISABLED}
+    volumes:
+      - libldap:/var/lib/ldap
+      - ldapslapd:/etc/ldap/slapd.d
+      - libsecauthority:/var/lib/ldap.secAuthority
+      - ${HOME}/dockershare/composekeys/openldap:/container/service/slapd/assets/certs
+    ports:
+#      - ${LDAP_PORT}:389
+      - ${LMI_IP}:1636:636
+
+  postgresql:
+    image: ${CONTAINER_BASE}-postgresql:${DB_VERSION}
+    hostname: postgresql
+    restart: always
+    environment:
+      - POSTGRES_DB=ivia
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Passw0rd
+      - POSTGRES_SSL_KEYDB=/var/local/server.pem
+#     - POSTGRES_UNSECURE=${DB_SSL_DISABLED}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ${HOME}/dockershare/composekeys/postgresql:/var/local

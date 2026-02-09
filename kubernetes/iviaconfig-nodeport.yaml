@@ -1,0 +1,14 @@
+# for external service access, see https://console.bluemix.net/docs/containers/cs_apps.html#cs_apps_public_nodeport
+apiVersion: v1
+kind: Service
+metadata:
+  name: iviaconfig-np
+spec:
+  type: NodePort
+  ports:
+    - port: 9443
+      name: iviaconfig
+      protocol: TCP
+      nodePort: 30442
+  selector:
+    app: iviaconfig
